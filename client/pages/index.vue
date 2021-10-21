@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     async timeRangeSelection(args) {
-      if(this.$auth.loggedIn && this.$auth.user.is_admin) {
+      if(!this.$auth.loggedIn || this.$auth.user.is_admin) {
         // this.adminSetup(args);
         return true;
       }
