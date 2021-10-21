@@ -46,12 +46,15 @@ export default {
   methods: {
     previous() {
       this.config.startDate = this.config.startDate.addDays(-7);
+      this.fetchEvents();
     },
     next() {
       this.config.startDate = this.config.startDate.addDays(+7);
+      this.fetchEvents();
     },
     today() {
       this.config.startDate = DayPilot.Date.today().firstDayOfWeek()
+      this.fetchEvents();
     },
     changeDate(date) {
       this.config.startDate = date.firstDayOfMonth();
@@ -72,7 +75,7 @@ export default {
     async fetchEvents() {
       const start_date = this.config.startDate.value;
       const end_date = this.config.startDate.addDays(6).value;
-      this.config.resources = [];
+      this.config.events = [];
 
       await this.$axios.$get('/api/schedules', {
         params: {
@@ -81,22 +84,26 @@ export default {
         }
       })
       .then(response => {
-        response.data.forEach(item => {
+        this.addEvents(response.data);
 
-          this.config.events.push({
-            "start": DayPilot.Date(item.date),
-            "end": DayPilot.Date(item.date),
-            "id": item.id,
-            "resource": item.job,
-            "text": item.shift + '\n' + item.user.name,
-            "backColor": this.getEventColor(item)
-          })
-          // this.config.events.push(item)
-        });
       });
 
       // this.$store.dispatch('fetchSchedules', [start_date, end_date]);
       // this.setResource();
+    },
+    addEvents(data) {
+      data.forEach(item => {
+
+        this.config.events.push({
+          "start": DayPilot.Date(item.date),
+          "end": DayPilot.Date(item.date),
+          "id": item.id,
+          "resource": item.job,
+          "text": item.shift + '\n' + item.user.name,
+          "backColor": this.getEventColor(item)
+        })
+        // this.config.events.push(item)
+      });
     },
     getEventColor(event) {
       let color = '';
